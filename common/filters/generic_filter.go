@@ -37,14 +37,16 @@ func (gf *GenericFilter) Filter(event *v1.Event) (matched bool) {
 		field = reflect.Indirect(reflect.ValueOf(event)).FieldByName("Reason")
 	case "Object":
 		log.Error("@@@@@@@@@@ hit Object case")
-		field = reflect.Indirect(reflect.ValueOf(event)).FieldByName("Object")
+		field = reflect.Indirect(reflect.ValueOf(event)).FieldByName("InvolvedObject")
 		log.Infof("event: %#v, field: %#v\n", event, field)
 	}
 
 	if IsZero(field) {
+		log.Error("************ error field")
 		return false
 	}
 
+	log.Infof("&&&&&&&&&&&&&&&&&& gf:keys: %#v\n", gf.keys)
 	for _, k := range gf.keys {
 		// enable regexp
 		if gf.regexp {
