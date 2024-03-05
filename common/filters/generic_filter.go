@@ -34,6 +34,10 @@ func (gf *GenericFilter) Filter(event *v1.Event) (matched bool) {
 		field = reflect.Indirect(reflect.ValueOf(event)).FieldByName("Type")
 	case "Reason":
 		field = reflect.Indirect(reflect.ValueOf(event)).FieldByName("Reason")
+	case "Object":
+		log.Error("@@@@@@@@@@ hit Object case")
+		field = reflect.Indirect(reflect.ValueOf(event)).FieldByName("Object")
+		log.Infof("event: %#v, field: %#v\n", event, field)
 	}
 
 	if IsZero(field) {

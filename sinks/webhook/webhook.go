@@ -3,13 +3,14 @@ package webhook
 import (
 	"bytes"
 	"fmt"
-	"github.com/AliyunContainerService/kube-eventer/util"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/AliyunContainerService/kube-eventer/util"
 
 	"github.com/AliyunContainerService/kube-eventer/common/filters"
 	"github.com/AliyunContainerService/kube-eventer/common/kubernetes"
@@ -189,6 +190,15 @@ func NewWebHookSink(uri *url.URL) (*WebHookSink, error) {
 		// reason filter support regexp.
 		reasons := filters.GetValues(opts["reason"])
 		s.filters["ReasonsFilter"] = filters.NewGenericFilter("Reason", reasons, true)
+	}
+
+	fmt.Println("debug here")
+
+	if len(opts["object"]) >= 1 {
+		// object filter support regexp
+		fmt.Println("@@@@@@@@@@@@@@@@@ match object, object:", opts["object"])
+		objects := filters.GetValues(opts["object"])
+		s.filters["ObjectFilter"] = filters.NewGenericFilter("Object", objects, true)
 	}
 
 	if len(opts["custom_body_configmap"]) >= 1 {
