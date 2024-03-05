@@ -1,6 +1,7 @@
 package filters
 
 import (
+	"fmt"
 	"reflect"
 	"regexp"
 
@@ -49,9 +50,11 @@ func (gf *GenericFilter) Filter(event *v1.Event) (matched bool) {
 		if gf.regexp {
 			if ok, err := regexp.Match(k, []byte(field.String())); err == nil && ok {
 				matched = true
+				fmt.Printf("!!!!!!!!!!!!!!!!!! match fiele: %#v\n", field.String())
 				return
 			} else {
 				if err != nil {
+					fmt.Printf("################### not match fiele: %#v\n", field.String())
 					log.Errorf("Failed to match pattern %s with %s,because of %v", k, field.String(), err)
 				}
 			}
