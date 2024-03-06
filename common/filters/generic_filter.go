@@ -37,11 +37,12 @@ func (gf *GenericFilter) Filter(event *v1.Event) (matched bool) {
 	case "Reason":
 		field = reflect.Indirect(reflect.ValueOf(event)).FieldByName("Reason")
 	case "Object":
+		log.Infof("&&&&&&&&&&&&&&&&&& gf:keys: %#v\n", gf.keys)
 		log.Error("@@@@@@@@@@ hit Object case")
-		field = reflect.Indirect(reflect.ValueOf(event)).FieldByName("InvolvedObject")
-		log.Infof("event: %#v, field: %#v\n", event, field.String())
-		field = reflect.Indirect(reflect.ValueOf(event)).FieldByName("ObjectMeta")
-		log.Infof("event: %#v, field: %#v, field: %#v\n", event, field.String(), field)
+		field = reflect.Indirect(reflect.ValueOf(event)).FieldByNameFunc(func(name string) bool {
+			return name == "ObjectMeta"
+		}).FieldByName("Name")
+		log.Infof("event: %#v, field: %s, field: %#v\n", event, field.String(), field)
 		for _, k := range gf.keys {
 			// 包含子串时，希望过滤掉改子串
 			filteFlag := !(k != "" && k[0] == '!')
