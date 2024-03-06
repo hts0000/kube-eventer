@@ -5,10 +5,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var (
 	TestEvent = &v1.Event{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "mims-mas-product-service-5ff5668cdf-qppr2.17ba228424da4149",
+		},
 		Type: "Warning",
 		InvolvedObject: v1.ObjectReference{
 			Kind:      "Node",
@@ -36,4 +40,7 @@ func TestEvents(t *testing.T) {
 
 	regexReasonsFilter := NewGenericFilter("Reason", []string{"Unhealthy", "BackOff"}, true)
 	assert.True(t, regexReasonsFilter.Filter(TestEvent), "")
+
+	objectFilter := NewGenericFilter("Object", []string{"mims-mas-product-service"}, true)
+	assert.True(t, objectFilter.Filter(TestEvent))
 }

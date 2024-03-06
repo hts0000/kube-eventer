@@ -44,15 +44,19 @@ func (gf *GenericFilter) Filter(event *v1.Event) (matched bool) {
 		}).FieldByName("Name")
 		log.Infof("event: %#v, field: %s, field: %#v\n", event, field.String(), field)
 		for _, k := range gf.keys {
-			// 包含子串时，希望过滤掉改子串
-			filteFlag := !(k != "" && k[0] == '!')
-			s := k[1:]
-			if strings.Contains(field.String(), s) {
-				// 包含子串，但是希望过滤掉
-				return true && filteFlag
+			if k != "" {
+				if k[0] == '!' {
+					if strings.Contains(field.String(), k[1:]) {
+						return false
+					}
+				} else {
+					if !strings.Contains(field.String(), k) {
+						return false
+					}
+				}
 			}
 		}
-		return false
+		return true
 	}
 
 	if IsZero(field) {
