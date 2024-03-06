@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"strings"
 
 	v1 "k8s.io/api/core/v1"
 	log "k8s.io/klog"
@@ -38,7 +39,19 @@ func (gf *GenericFilter) Filter(event *v1.Event) (matched bool) {
 	case "Object":
 		log.Error("@@@@@@@@@@ hit Object case")
 		field = reflect.Indirect(reflect.ValueOf(event)).FieldByName("InvolvedObject")
-		log.Infof("event: %#v, field: %#v\n", event, field)
+		log.Infof("event: %#v, field: %#v\n", event, field.String())
+		field = reflect.Indirect(reflect.ValueOf(event)).FieldByName("ObjectMeta")
+		log.Infof("event: %#v, field: %#v, field: %#v\n", event, field.String(), field)
+		for _, k := range gf.keys {
+			// 包含子串时，希望过滤掉改子串
+			filteFlag := !(k != "" && k[0] == '!')
+			s := k[1:]
+			if strings.Contains(field.String(), s) {
+				// 包含子串，但是希望过滤掉
+				return true && filteFlag
+			}
+		}
+		return false
 	}
 
 	if IsZero(field) {
